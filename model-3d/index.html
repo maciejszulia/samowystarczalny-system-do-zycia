@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gospodarstwo Młodzieżowa 1 w 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Condensed:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: one-screen app. 3D stage fills the screen; control panel docks right on wide screens and below the stage on phones. */
+  --paper:#e9eeec; --panel:#f7f8f5; --ink:#16222a; --muted:#56646c; --line:#d0d7d3;
+  --accent:#c44d1b; --accent-ink:#ffffff; --chip:#e3e9e5; --sky:#cddbe1;
+  --label-bg:rgba(255,255,255,.92); --label-ink:#16222a;
+  --font-display:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --font-body:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#10171a; --panel:#172024; --ink:#e8eeeb; --muted:#9aa9ae; --line:#2b383d;
+    --accent:#f0884a; --accent-ink:#1b1105; --chip:#222e33; --sky:#1a262c;
+    --label-bg:rgba(20,28,32,.9); --label-ink:#f1f5f3; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#10171a; --panel:#172024; --ink:#e8eeeb; --muted:#9aa9ae; --line:#2b383d;
+  --accent:#f0884a; --accent-ink:#1b1105; --chip:#222e33; --sky:#1a262c;
+  --label-bg:rgba(20,28,32,.9); --label-ink:#f1f5f3; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.4;overflow:hidden}
+#app{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 340px;grid-template-rows:minmax(0,1fr)}
+#stage{position:relative;min-width:0;min-height:0;background:var(--sky);overflow:hidden}
+#scene{display:block;width:100%;height:100%;touch-action:none;outline:none}
+#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lab{position:absolute;left:0;top:0;white-space:nowrap;font-family:var(--font-display);font-weight:600;font-size:13px;letter-spacing:.02em;
+  padding:1px 6px;border-radius:3px;background:var(--label-bg);color:var(--label-ink);will-change:transform}
+.lab.zone{font-size:12px;border:1px solid rgba(0,0,0,.35)}
+.lab.obj{background:var(--accent);color:var(--accent-ink)}
+.lab.field{background:rgba(60,40,10,.82);color:#fff7e0;font-weight:500}
+.lab.water{background:transparent;color:#eaf6ff;font-style:italic;font-weight:500;font-size:14px;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.lab.map{background:rgba(0,0,0,.55);color:#fff}
+#readout{position:absolute;left:12px;bottom:12px;max-width:calc(100% - 24px);padding:6px 10px;border-radius:4px;background:var(--label-bg);color:var(--label-ink);
+  font-size:13px;font-variant-numeric:tabular-nums}
+#sunwarn{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:4px;background:var(--accent);color:var(--accent-ink);font-size:13px;font-weight:500}
+#toggle-panel{display:none;position:absolute;right:12px;top:12px;padding:8px 12px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink);
+  font:600 14px var(--font-display);letter-spacing:.03em;cursor:pointer}
+#fail{position:absolute;inset:0;margin:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:16px;background:var(--paper)}
+#fail[hidden]{display:none}
+#panel{background:var(--panel);border-left:1px solid var(--line);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 28px;display:flex;flex-direction:column;gap:18px}
+#panel header h1{margin:0;font:600 26px/1.05 var(--font-display);letter-spacing:.01em;text-wrap:balance}
+#panel header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+#panel section{display:flex;flex-direction:column;gap:8px}
+#panel h2{margin:0;font:600 14px var(--font-display);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:4px}
+.toggles{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.toggles label{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:4px;background:var(--chip);font-size:13.5px;cursor:pointer;min-height:36px}
+.toggles input{width:16px;height:16px;accent-color:var(--accent);flex:none;margin:0}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button,.btns button{flex:1 1 auto;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--chip);color:var(--ink);font:500 14px var(--font-body);cursor:pointer;min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13.5px}
+input[type=range]{width:100%;accent-color:var(--accent);margin:2px 0}
+.num{font-variant-numeric:tabular-nums;font-weight:600}
+.note{margin:0;color:var(--muted);font-size:12.5px}
+ul.legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:13px}
+ul.legend li{display:grid;grid-template-columns:16px 34px 1fr auto;gap:8px;align-items:baseline}
+ul.legend .sw{width:14px;height:14px;border-radius:2px;border:1px solid rgba(0,0,0,.4);align-self:center}
+ul.legend .code{font:600 13px var(--font-display);letter-spacing:.03em}
+ul.legend .area{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+ul.objs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:13px}
+ul.objs li{display:grid;grid-template-columns:44px 1fr;gap:8px}
+ul.objs b{font:600 13px var(--font-display);letter-spacing:.03em;color:var(--accent)}
+@media (max-width:760px){
+  #app{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,44%)}
+  #app.collapsed{grid-template-rows:minmax(0,1fr) 0}
+  #app.collapsed #panel{display:none}
+  #panel{border-left:0;border-top:1px solid var(--line);padding:12px 16px 24px;gap:14px}
+  #panel header h1{font-size:22px}
+  #toggle-panel{display:block}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <main id="stage" aria-label="Model 3D gospodarstwa">
+    <canvas id="scene" tabindex="0"></canvas>
+    <div id="labels" aria-hidden="true"></div>
+    <div id="sunwarn" hidden>Słońce jest pod horyzontem.</div>
+    <button id="toggle-panel" type="button" aria-expanded="true" aria-controls="panel">Ukryj panel</button>
+    <div id="readout">Dotknij terenu: współrzędne, wysokość i strefa.</div>
+    <p id="fail" hidden></p>
+  </main>
+  <aside id="panel">
+    <header>
+      <h1>Gospodarstwo Młodzieżowa 1</h1>
+      <p>Model 3D projektu · Olsztyn-Gutkowo · 4,27 ha · teren od 104,6 m do 120,2 m n.p.m.</p>
+    </header>
+    <section aria-labelledby="h-sun">
+      <h2 id="h-sun">Słońce i cień</h2>
+      <div class="seg" role="group" aria-label="Dzień">
+        <button type="button" id="day-dec" aria-pressed="true">21 grudnia</button>
+        <button type="button" id="day-mar" aria-pressed="false">21 marca</button>
+        <button type="button" id="day-jun" aria-pressed="false">21 czerwca</button>
+      </div>
+      <div class="row"><label for="sun-time">Godzina czasu słonecznego</label><span class="num" id="sun-clock">12:00</span></div>
+      <input type="range" id="sun-time" min="4" max="20" step="0.25" value="12">
+      <div class="row"><span>Azymut <span class="num" id="sun-az">180°</span></span><span>Wysokość <span class="num" id="sun-el">12,8°</span></span></div>
+      <p class="note">Cień rzucają: teren, drzewa i budynki z pomiaru z 2018 r. oraz obiekty projektu.</p>
+    </section>
+    <section aria-labelledby="h-lyr">
+      <h2 id="h-lyr">Warstwy</h2>
+      <div class="toggles">
+        <label><input type="checkbox" id="lyr-zones" checked>Strefy</label>
+        <label><input type="checkbox" id="lyr-plan" checked>Plan upraw</label>
+        <label><input type="checkbox" id="lyr-obj" checked>Obiekty projektu</label>
+        <label><input type="checkbox" id="lyr-labels" checked>Podpisy</label>
+        <label><input type="checkbox" id="lyr-trees" checked>Drzewa i budynki</label>
+        <label><input type="checkbox" id="lyr-s8a" checked>Drzewostan S8a</label>
+        <label><input type="checkbox" id="lyr-parcels" checked>Granice działek</label>
+        <label><input type="checkbox" id="lyr-shadow" checked>Cień</label>
+      </div>
+    </section>
+    <section aria-labelledby="h-view">
+      <h2 id="h-view">Widok</h2>
+      <div class="btns">
+        <button type="button" id="view-south">Z południa</button>
+        <button type="button" id="view-top">Z góry</button>
+        <button type="button" id="view-pv">Stelaż fotowoltaiki</button>
+        <button type="button" id="view-north">Z północy</button>
+      </div>
+      <div class="toggles"><label style="grid-column:1/-1"><input type="checkbox" id="vex">Przewyższenie wysokości ×2 (wyłącza cień)</label></div>
+    </section>
+    <section aria-labelledby="h-zones">
+      <h2 id="h-zones">Strefy</h2>
+      <ul class="legend" id="zone-list"></ul>
+    </section>
+    <section aria-labelledby="h-objs">
+      <h2 id="h-objs">Obiekty projektu</h2>
+      <ul class="objs">
+        <li><b>PV</b><span>Stelaż fotowoltaiki 25 kWp: 32 m, kąt 60°, azymut południowy.</span></li>
+        <li><b>W1</b><span>Zbiornik górny, grunt 118,2 m n.p.m.: 1,06 bar przy domu bez prądu.</span></li>
+        <li><b>T1</b><span>Tunel foliowy 90 m², oś północ–południe.</span></li>
+        <li><b>B1</b><span>Budynek inwentarski: kurnik na 100 sztuk i koziarnia. Obok woliera 100 m².</span></li>
+        <li><b>M1</b><span>Piwnica ziemna 17,6 m³ w stoku.</span></li>
+        <li><b>U1</b><span>Pasieka: 3 ule.</span></li>
+        <li><b>K</b><span>Gruzowisko: wierzchołek 120,2 m n.p.m.</span></li>
+        <li><b>P1–P5</b><span>Pola płodozmianu. Pola P3, P4 i P5 biegną wzdłuż warstwic.</span></li>
+      </ul>
+    </section>
+    <section aria-labelledby="h-data">
+      <h2 id="h-data">Dane</h2>
+      <p class="note">Teren: numeryczny model terenu GUGiK, siatka 1 m, pomiar 2018-03-21.</p>
+      <p class="note">Drzewa i budynki: model pokrycia terenu GUGiK z 2018-03-21. Pomiar bez liści zaniża korony drzew liściastych.</p>
+      <p class="note">Drzewostan S8a: schemat. Wysokość od 11 m do 16 m jest założeniem; wiek drzew od 20 do 50 lat podał właściciel.</p>
+      <p class="note">Ortofotomapa: GUGiK, zdjęcia z 2025-08-14. Projekt: stan z 2026-11-11.</p>
+    </section>
+  </aside>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
