@@ -41,6 +41,7 @@ Znaczniki źródeł każdej liczby stoją w dokumencie projektu. Wynik 92% wymag
 | [`raporty/`](raporty/) | 4 raporty z pełnymi obliczeniami: R1 teren i klimat, R2 żywność, R3 energia i woda, R4 horyzont stelaża. |
 | [`model-3d/`](model-3d/README.md) | Model 3D: teren, strefy, obiekty, cień Słońca. |
 | [`obliczenia/`](obliczenia/README.md) | Skrypty Pythona i dane wejściowe. |
+| [`operations/`](operations/poultry-water-line.md) | Budowa wodociągu do kur jako przykład operacji wdrożenia: 9 operacji, obliczenia, 3 rysunki. |
 | [`LICENCJE.md`](LICENCJE.md) | Licencje treści i kodu oraz dostawcy danych obcych. |
 
 Raporty R1, R2 i R3 pokazują stan sprzed odpowiedzi właściciela z 2026-11-11. Raport R4 w sekcji 9 i dokument projektu zawierają zmiany po tych odpowiedziach.
