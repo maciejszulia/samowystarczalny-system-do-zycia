@@ -189,7 +189,7 @@ Wykonawca wysyła polecenie i nie dostaje odpowiedzi. Wykonawca nie zna wtedy wy
 - x: objętość wody w zbiorniku W2 w dm³.
 - f: polecenie, które zmienia objętość x.
 
-Polecenie „napełnij zbiornik W2 do 60 dm³” spełnia wzór: wynik to 60 dm³ po 1 wykonaniu i po 2 wykonaniach. Polecenie „dolej 10 dm³” nie spełnia wzoru: 2 wykonania dają x + 20 dm³. Zawór pływakowy wykonuje polecenie pierwszego rodzaju. Protokół HTTP pozwala powtórzyć automatycznie tylko żądanie idempotentne `[źródło: Z56]`.
+Polecenie „napełnij zbiornik W2 do 60 dm³” spełnia wzór: wynik to 60 dm³ po 1 wykonaniu i po 2 wykonaniach. Polecenie „dolej 10 dm³” nie spełnia wzoru: 2 wykonania dają x + 20 dm³. Zawór pływakowy wykonuje polecenie pierwszego rodzaju. Protokół HTTP pozwala klientowi powtórzyć automatycznie żądanie idempotentne po awarii łącza `[źródło: Z56]`.
 
 ### 8.4. Twierdzenie CAP
 
