@@ -1,6 +1,6 @@
 # Samowystarczalny system do życia
 
-Repozytorium zawiera projekt gospodarstwa, które daje 4 osobom żywność, ciepło, wodę pitną i energię elektryczną bez sieci. Gospodarstwo ma 4,27 ha i leży w Olsztynie przy ul. Młodzieżowej 1 (Gutkowo). Projekt zawiera obliczenia, źródła, model 3D i listę braków. Data projektu: 2026-11-11.
+Repozytorium zawiera projekt gospodarstwa, które daje 4 osobom żywność, ciepło, wodę pitną i energię elektryczną bez sieci. Gospodarstwo ma 4,27 ha i leży w Olsztynie.. Projekt zawiera obliczenia, źródła, model 3D i listę braków. Data projektu: 2026-11-11.
 
 ![Widok 3D gospodarstwa od południa](projekt/rysunki/rys4-widok-3d.jpg)
 
@@ -87,8 +87,7 @@ Tabela „Decyzje i braki” w dokumencie projektu ma 20 pozycji.
 
 ## Autorzy
 
-- Właściciel gospodarstwa i projektu: Maciej Szulia.
-- Projekt, obliczenia i model 3D: Claude (model językowy firmy Anthropic) z 3 agentami badawczymi, na zlecenie właściciela.
+- Autor projektu, obliczeń i modelu 3D: Maciej Szulia.
 - Zapis: [Polszczyzna Kontrolowana 0.1](https://github.com/maciejszulia/polszczyzna-kontrolowana).
 
 ## Licencja
